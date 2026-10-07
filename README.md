@@ -27,3 +27,4 @@
 Проект использует стандартную библиотеку Python без сторонних пакетов. Не запускай второй экземпляр с тем же токеном: Telegram допускает один polling-процесс. При ошибке 409 останови второй экземпляр. При ошибке 401 проверь BOT_TOKEN.
 
 Документация: https://core.telegram.org/bots/api#inlinekeyboardbutton и https://docs.railway.com/builds/dockerfiles
+Обновление запуска.
