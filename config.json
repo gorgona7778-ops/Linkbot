@@ -1,9 +1,21 @@
 {
-  "caption": "<b>ДВИЖ · ЛИНК БОТ</b>\n\n<i>Всегда на связи.</i>\nКаналы и чаты ДВИЖ — в одном месте.\n\n<b>Выбери, куда перейти ↓</b>",
+  "caption": "<b>ДВИЖ · НАВИГАЦИЯ</b>\n\n<i>Оставайся на связи.</i>\nВсе наши каналы и чаты — ниже.\n\n<b>Выбери нужный раздел ↓</b>",
   "links": [
-    {"text": "ОСНОВНОЙ КАНАЛ ↗", "url": "https://clck.ru/3WJAQk"},
-    {"text": "РЕЗЕРВ КАНАЛ ↗", "url": "https://clck.ru/3WJAS3"},
-    {"text": "ОСНОВНОЙ ЧАТ ↗", "url": "https://clck.ru/3WJAU3"},
-    {"text": "РЕЗЕРВ ЧАТ ↗", "url": "https://clck.ru/3WJAVC"}
+    {
+      "text": "📢 Основной канал",
+      "url": "https://clck.ru/3WJAQk"
+    },
+    {
+      "text": "🛡 Резервный канал",
+      "url": "https://clck.ru/3WJAS3"
+    },
+    {
+      "text": "💬 Основной чат",
+      "url": "https://clck.ru/3WJAU3"
+    },
+    {
+      "text": "🔐 Резервный чат",
+      "url": "https://clck.ru/3WJAVC"
+    }
   ]
 }
