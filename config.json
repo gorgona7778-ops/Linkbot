@@ -1,0 +1,9 @@
+{
+  "caption": "<b>ДВИЖ · ЛИНК БОТ</b>\n\n<i>Всегда на связи.</i>\nКаналы и чаты ДВИЖ — в одном месте.\n\n<b>Выбери, куда перейти ↓</b>",
+  "links": [
+    {"text": "ОСНОВНОЙ КАНАЛ ↗", "url": "https://clck.ru/3WJAQk"},
+    {"text": "РЕЗЕРВ КАНАЛ ↗", "url": "https://clck.ru/3WJAS3"},
+    {"text": "ОСНОВНОЙ ЧАТ ↗", "url": "https://clck.ru/3WJAU3"},
+    {"text": "РЕЗЕРВ ЧАТ ↗", "url": "https://clck.ru/3WJAVC"}
+  ]
+}
