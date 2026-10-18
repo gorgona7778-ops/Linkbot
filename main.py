@@ -1,4 +1,3 @@
-
 """ДВИЖ navigation bot with opt-in broadcasts and PostgreSQL analytics."""
 import datetime as dt
 import json
@@ -18,6 +17,8 @@ ROOT = Path(__file__).resolve().parent
 STOP = threading.Event()
 LOG = logging.getLogger('dvizh')
 ADMIN_ID = int(os.getenv('ADMIN_ID', '7951665024'))
+CHANNEL_ID = '@dvizh_qaz'
+CHANNEL_URL = 'https://t.me/dvizh_qaz'
 
 class APIError(Exception):
     def __init__(self, code, retry_after=5, description=''):
@@ -45,7 +46,7 @@ class Bot:
         self.db.execute('''CREATE TABLE IF NOT EXISTS deliveries (
             broadcast_id BIGINT NOT NULL REFERENCES broadcasts(id), user_id BIGINT NOT NULL,
             status TEXT NOT NULL DEFAULT 'pending', PRIMARY KEY (broadcast_id,user_id))''')
-        self.drafts = {}
+        self.drafts = {}  # Temporary per-admin drafts, never sent without confirmation
 
     def api(self, method, data, photo=None):
         if photo is None:
@@ -89,6 +90,25 @@ class Bot:
             data['photo'] = self.photo_id
         result = self.api('sendPhoto', data, None if self.photo_id else self.photo)
         self.photo_id = result['photo'][-1]['file_id']
+
+    def is_channel_member(self, user_id):
+        try:
+            member = self.api('getChatMember', {'chat_id': CHANNEL_ID, 'user_id': user_id})
+            status = member.get('status')
+            return status in ('creator', 'administrator', 'member') or (
+                status == 'restricted' and member.get('is_member', False)
+            )
+        except APIError as error:
+            LOG.warning('Subscription check failed code=%s: %s', error.code, error.description)
+            return None
+
+    def subscription_gate(self, chat_id, check_failed=False):
+        message = ('Не удалось проверить подписку. Попробуй позже.' if check_failed else
+                   'Чтобы открыть меню ДВИЖ, подпишись на канал и нажми «Проверить подписку».')
+        self.send(chat_id, message, [
+            [{'text': '📢 Подписаться', 'url': CHANNEL_URL}],
+            [{'text': '✅ Проверить подписку', 'callback_data': 'channel:check'}],
+        ])
 
     def record(self, user):
         self.db.execute('''INSERT INTO users (user_id,username) VALUES (%s,%s)
@@ -155,6 +175,13 @@ class Bot:
         data = callback.get('data', '')
         user_id = sender.get('id')
         self.api('answerCallbackQuery', {'callback_query_id': callback['id']})
+        if data == 'channel:check':
+            status = self.is_channel_member(user_id)
+            if status is True:
+                self.menu(user_id)
+            else:
+                self.subscription_gate(user_id, check_failed=(status is None))
+            return
         if data == 'u:on':
             self.db.execute('UPDATE users SET subscribed=TRUE WHERE user_id=%s', (user_id,))
             self.send(user_id, 'Уведомления включены. Для отказа отправь /stop.')
@@ -225,10 +252,14 @@ class Bot:
                        [{'text': '❌ Отмена', 'callback_data': 'a:cancel'}]])
             return
         if command in ('/start', '/links', '/help'):
+            status = self.is_channel_member(sender['id'])
+            if status is not True:
+                self.subscription_gate(chat_id, check_failed=(status is None))
+                return
             self.menu(chat_id)
             if command == '/start':
                 self.send(chat_id, 'Хочешь получать обновления ДВИЖ? Это необязательно.',
-                          [[{'text': '🔔 Подписаться', 'callback_data': 'u:on'}]])
+                          [[{'text': '🔔 Подписаться на уведомления', 'callback_data': 'u:on'}]])
 
     def run(self):
         self.api('getMe', {})
